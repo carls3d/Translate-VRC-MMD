@@ -151,7 +151,8 @@ def mmd_duplicate(move_keys=False, skip_duplicates=True, vrc=True, eyes=True, mo
     
     i = 0
     for key_index, key in enumerate(shapekeys):
-        if key.name.lower() not in translate: continue
+        # if key.name.lower() not in translate: continue
+        if key.name not in translate: continue
         if skip_duplicates: 
             if translate[key.name] in shapekeys: continue
         new_name = translate[key.name]
