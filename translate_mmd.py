@@ -1,7 +1,7 @@
 import bpy
+# MIT License - feel free to share
 # By Carlsu https://ko-fi.com/carlsu
-# Feel free to share
-# Please change this description if edited
+# -- Change this description if edited --
 
 translate_vrc = {
     "vrc.v_aa": "あ", 
