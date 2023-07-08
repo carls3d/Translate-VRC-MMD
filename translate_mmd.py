@@ -127,7 +127,7 @@ def duplicate_move_shapekey(from_mix = False) -> None:
 
     bpy.context.object.show_only_shape_key = only_active
     
-def mmd_duplicate(move_keys=False, skip_duplicates=True, vrc=True, eyes=True, mouth=True, brows=True):
+def mmd_duplicate(move_keys=False, skip_duplicates=True, force_lowercase=False, vrc=True, eyes=True, mouth=True, brows=True):
     """move_keys: If True, will move each key to it's original key (slow)"""
     def top_to_bottom(index:int) -> None:
         bpy.ops.object.shape_key_move(type='TOP')
@@ -138,36 +138,40 @@ def mmd_duplicate(move_keys=False, skip_duplicates=True, vrc=True, eyes=True, mo
         for i in range(index):
             bpy.ops.object.shape_key_move(type='UP')
     
+    def dict_update(dict1:dict, dict2:dict, force_lowercase:bool=False) -> None:
+        keys_lower = lambda x: {k.lower(): v for k, v in x.items()}
+        dict1.update(keys_lower(dict2) if force_lowercase else dict2)
+    
     assert vrc or eyes or mouth or brows, "At least one of vrc, eyes, mouth, brows must be True"
     translate = {}
-    translate.update(translate_vrc) if vrc else None
-    translate.update(translate_eyes) if eyes else None
-    translate.update(translate_mouth) if mouth else None
-    translate.update(translate_brows) if brows else None
-    
+    dict_update(translate, translate_vrc, force_lowercase) if vrc else None
+    dict_update(translate, translate_eyes, force_lowercase) if eyes else None
+    dict_update(translate, translate_mouth, force_lowercase) if mouth else None
+    dict_update(translate, translate_brows, force_lowercase) if brows else None
             
     only_active = bpy.context.object.show_only_shape_key
     bpy.context.object.show_only_shape_key = True
     
     i = 0
     for key_index, key in enumerate(shapekeys):
-        # if key.name.lower() not in translate: continue
-        if key.name not in translate: continue
-        if skip_duplicates: 
-            if translate[key.name] in shapekeys: continue
-        new_name = translate[key.name]
-        obj.active_shape_key_index = key_index
+        
+        name = key.name.lower() if force_lowercase else key.name
+        if name not in translate: continue
+        new_name = translate[name]
+        if skip_duplicates and translate[name] in shapekeys: continue
+        
+        obj.active_shape_key_index = key_index + i
         obj.shape_key_add(name=new_name, from_mix=True)
         new_index = len(shapekeys) - 1
         obj.active_shape_key_index = new_index
         if not move_keys: continue
         
-        if new_index / 2 > key_index: # Distance from new_key to active_key is more than half of length of shapekeys
+        if new_index / 2 > key_index + i: # Distance from new_key to active_key is more than half of length of shapekeys
             top_to_bottom(key_index + i)
         else:
             bottom_to_top(new_index - key_index - 1 - i)
         i += 1
-            
+    
     bpy.context.object.show_only_shape_key = only_active
 
 
@@ -176,8 +180,9 @@ def mmd_duplicate(move_keys=False, skip_duplicates=True, vrc=True, eyes=True, mo
 if __name__ == "__main__":
     mmd_duplicate(
         # Enable or disable the following options by setting them to True or False
-        move_keys=True,  # Whether to move shape keys
+        move_keys=True,  # Whether to move shape keys (slow)
         skip_duplicates=True,  # Whether to skip duplicate shape keys
+        force_lowercase=True, # Whether to force lowercase (less strict)
         vrc=True,  # Whether to include VRC keys
         eyes=True,  # Whether to include eye keys
         mouth=True,  # Whether to include mouth keys
