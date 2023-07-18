@@ -180,7 +180,7 @@ def mmd_duplicate(move_keys=False, skip_duplicates=True, force_lowercase=False, 
 if __name__ == "__main__":
     mmd_duplicate(
         # Enable or disable the following options by setting them to True or False
-        move_keys=True,  # Whether to move shape keys (slow)
+        move_keys=False,  # Whether to move shape keys (slow)
         skip_duplicates=True,  # Whether to skip duplicate shape keys
         force_lowercase=True, # Whether to force lowercase (less strict)
         vrc=True,  # Whether to include VRC keys
