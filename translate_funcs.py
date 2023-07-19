@@ -2,9 +2,9 @@ import bpy
 # MIT License - Carlsu 2023
 # You can support me here: https://ko-fi.com/carlsu
 # 
-# -- Change this description if edited --
+# This version is for the add-on, see translate_mmd.py for the script
 
-translate_vrc = {
+VRChat = {
     "vrc.v_aa": "あ", 
     "vrc.v_ch": "ち",
     "vrc.v_dd": "ど",
@@ -21,8 +21,7 @@ translate_vrc = {
     "vrc.v_ss": "す",
     "vrc.v_th": "て"
 }
-
-translate_eyes = {
+Eyes = {
     "Blink": "まばたき",
     "Smile": "笑い",
     "Wink": "ウィンク",
@@ -49,8 +48,7 @@ translate_eyes = {
     "Wail": "悲しむ",
     "Hostility": "敵意"
 }
-
-translate_mouth = {
+Mouth = {
     "a": "あ",
     "i": "い",
     "u": "う",
@@ -76,8 +74,7 @@ translate_mouth = {
     "ToothAnon": "歯無し上",
     "ToothBnon": "歯無し下"
 }
-
-translate_brows = {
+Brows = {
     "Serious": "真面目",
     "Trouble": "困る",
     "Smily": "にこり",
@@ -86,15 +83,22 @@ translate_brows = {
     "Down": "下"
 }
 
-
-obj = bpy.context.object
-assert obj.type == "MESH", "Object needs to be a mesh"
-shapekeys = obj.data.shape_keys
-assert shapekeys, "No shapekeys found"
-shapekeys = shapekeys.key_blocks
+def return_translations(vrc=True, eyes=True, mouth=True, brows=True):
+    out = []
+    out.append(["-- VRChat --"]+[f"{k}: {v}" for k, v in VRChat.items()] if vrc else [])
+    out.append(["-- Eyes --"]+[f"{k}: {v}" for k, v in Eyes.items()] if eyes else [])
+    out.append(["-- Mouth --"]+[f"{k}: {v}" for k, v in Mouth.items()] if mouth else [])
+    out.append(["-- Brows --"]+[f"{k}: {v}" for k, v in Brows.items()] if brows else [])
+    return out
 
 def mmd_duplicate(move_keys=False, skip_duplicates=True, force_lowercase=False, vrc=True, eyes=True, mouth=True, brows=True):
     """move_keys: If True, will move each key to it's original key (slow)"""
+    obj = bpy.context.object
+    assert obj.type == "MESH", "Object needs to be a mesh"
+    shapekeys = obj.data.shape_keys
+    assert shapekeys, "No shapekeys found"
+    shapekeys = shapekeys.key_blocks
+    
     def top_to_bottom(index:int) -> None:
         bpy.ops.object.shape_key_move(type='TOP')
         for i in range(index):
@@ -110,10 +114,10 @@ def mmd_duplicate(move_keys=False, skip_duplicates=True, force_lowercase=False, 
     
     assert vrc or eyes or mouth or brows, "At least one of vrc, eyes, mouth, brows must be True"
     translate = {}
-    dict_update(translate, translate_vrc, force_lowercase) if vrc else None
-    dict_update(translate, translate_eyes, force_lowercase) if eyes else None
-    dict_update(translate, translate_mouth, force_lowercase) if mouth else None
-    dict_update(translate, translate_brows, force_lowercase) if brows else None
+    dict_update(translate, VRChat, force_lowercase) if vrc else None
+    dict_update(translate, Eyes, force_lowercase) if eyes else None
+    dict_update(translate, Mouth, force_lowercase) if mouth else None
+    dict_update(translate, Brows, force_lowercase) if brows else None
             
     only_active = bpy.context.object.show_only_shape_key
     bpy.context.object.show_only_shape_key = True
@@ -139,18 +143,3 @@ def mmd_duplicate(move_keys=False, skip_duplicates=True, force_lowercase=False, 
         i += 1
     
     bpy.context.object.show_only_shape_key = only_active
-
-
-
-
-if __name__ == "__main__":
-    mmd_duplicate(
-        # Enable or disable the following options by setting them to True or False
-        move_keys=False,  # Whether to move shape keys (slow)
-        skip_duplicates=True,  # Whether to skip duplicate shape keys
-        force_lowercase=True, # Whether to force lowercase (less strict)
-        vrc=True,  # Whether to include VRC keys
-        eyes=True,  # Whether to include eye keys
-        mouth=True,  # Whether to include mouth keys
-        brows=True  # Whether to include brow keys
-    )
