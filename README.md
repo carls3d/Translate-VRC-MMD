@@ -2,7 +2,7 @@
 Translates blendshapes to their japanese mmd versions
 
 ---
-**Quick one time use: [https://pastebin.com/raw/7Pncz1xY](https://pastebin.com/raw/7Pncz1xY)**
+**Quick one time use: [https://pastebin.com/raw/jyjqHrP9](https://pastebin.com/raw/jyjqHrP9)**
 
 - Select all, copy
 In blender:
